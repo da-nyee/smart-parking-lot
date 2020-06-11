@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <script src="/socket.io/socket.io.js"></script>
+
+        <script>
+            window.onload = function() {
+                var socket = io.connect();
+
+                document.getElementById('start').onclick = function() {
+                    var text = document.getElementById('text').value;
+                    socket.emit('startmsg', text);
+                };
+                document.getElementById('stop').onclick = function() {
+                    var text = document.getElementById('text').value;
+                    socket.emit('stopmsg', text);
+                };
+            };
+        </script>
+    </head>
+    <body>
+        <input type="text" id="text" value="500" />ms
+        <input type="button" id="start" value="측정가동">
+        <input type="button" id="stop" value="측정중지">
+    </body>
+</html>
