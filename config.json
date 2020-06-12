@@ -1,1 +1,10 @@
-[{"test":false,"accel":true,"elev":true,"lazer":true}]
+[
+    {
+        "test":false,
+        "accel":true,
+        "elev":true,
+        "lazer":true,
+        "parking":true,
+        "double_parking":true
+    }
+]
