@@ -4,6 +4,7 @@
         "accel":true,
         "elev":true,
         "lazer":true,
-        "parking":true
+        "parking":true,
+        "double_parking":true
     }
 ]

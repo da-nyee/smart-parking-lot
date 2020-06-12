@@ -11,14 +11,14 @@ const SPI_SPEED = 1000000;
 const accelTrig = 24;
 const accelEcho = 25;
 const BUZZER = 7;
-const LAZER = 29;
+const RAZER = 29;
 const CS_MCP3208_0 = 10;
 const CS_MCP3208_1 = 11;
 
 const ELEV_UP = 3;
 const ELEV_DOWN = 4;
 
-// 주차 차량 감지 (주차 자리 총 3개)
+// 주차 차량 감지 (총 3개)
 const CAR_PARKING_0 = 0;
 const CAR_PARKING_1 = 1;
 const CAR_PARKING_2 = 2;
@@ -34,6 +34,13 @@ let connection = mysql.createConnection({
     password: 'gachon654321',
     database: 'parkdb'
 });
+
+// 두 자리 주차 차량 감지 (총 2개)
+const DOUBLE_PARKING_5 = 5;
+const DOUBLE_PARKING_6 = 6;
+
+let double_lightdata_5 = -1;
+let double_lightdata_6 = -1;
 
 var startTime;
 var travelTime;
@@ -51,7 +58,7 @@ var count = 0;
 
 var url = 'http://192.9.45.132:65001'
 
-// initialization
+// initialization (functions)
 const elev_up = mcpadc.openMcp3208(ELEV_UP, {speedHz: SPI_SPEED}, (err) => {
   console.log('elev_up init...');
   if(err)
@@ -65,15 +72,24 @@ const elev_down = mcpadc.openMcp3208(ELEV_DOWN, {speedHz: SPI_SPEED}, (err) => {
 
 const car_parking_0 = mcpadc.openMcp3208(CAR_PARKING_0, {speedHz: SPI_SPEED}, (err) => {
     console.log('car_parking_0 init...');
-    if(err) { console.log('fail!'); }
+    if(err) { console.log('car_parking_0 fail!'); }
 });
 const car_parking_1 = mcpadc.openMcp3208(CAR_PARKING_1, {speedHz: SPI_SPEED}, (err) => {
     console.log('car_parking_1 init...');
-    if(err) { console.log('fail!'); }
+    if(err) { console.log('car_parking_1 fail!'); }
 });
 const car_parking_2 = mcpadc.openMcp3208(CAR_PARKING_2, {speedHz: SPI_SPEED}, (err) => {
     console.log('car_parking_2 init...');
-    if(err) { console.log('fail!'); }
+    if(err) { console.log('car_parking_2 fail!'); }
+});
+
+const double_parking_5 = mcpadc.openMcp3208(DOUBLE_PARKING_5, {speedHz: SPI_SPEED}, (err) => {
+    console.log('double_parking_5 init...');
+    if(err) { console.log('double_parking_5 fail!'); }
+});
+const double_parking_6 = mcpadc.openMcp3208(DOUBLE_PARKING_6, {speedHz: SPI_SPEED}, (err) => {
+    console.log('double_parking_6 init...');
+    if(err) { console.log('double_parking_6 fail!'); }
 });
 
 
@@ -103,6 +119,13 @@ const mainController = () => {
     // 주차 차량 감지
     if(data.parking == true) {
         carParking();
+    }
+
+    // 두 자리 주차 차량 감지
+    if(data.double_parking == true) {
+        gpio.digitalWrite(RAZER, 1);
+        carDoubleParking();
+        gpio.digitalWrite(RAZER, 1);
     }
 });
 
@@ -324,12 +347,72 @@ const carParking = () => {
     }
 }
 
+let double_time_5 = 0;
+let double_time_6 = 0;
+// 두 자리 주차 차량 감지
+const carDoubleParking = () => {
+    
+    // 두 자리 주차 자리 5번
+    double_parking_5.read((error, reading) => {
+        console.log("두 자리 주차 5번 조도값: %d", reading.rawValue);
 
+        double_lightdata_5 = reading.rawValue;
+    });
+
+    if(double_lightdata_5 != -1) {
+        if(double_lightdata_5 > 300) {
+            double_time_5 += timeout;
+            console.log("double_time_5: %d", double_time_5);
+
+            if(double_time_5 >= n) {            
+                console.log("double_parking_5: BUZZER ON!");
+                gpio.digitalWrite(BUZZER, 1);
+                double_time_5 = 0;
+
+                setTimeout(turnOffBuzzer, 1000);
+            }
+        }
+        else {
+            double_time_5 = 0;
+        }
+
+        double_lightdata_5 = -1;
+    }
+
+    // 두 자리 주차 자리 6번
+    double_parking_6.read((error, reading) => {
+        console.log("두 자리 주차 6번 조도값: %d", reading.rawValue);
+
+        double_lightdata_6 = reading.rawValue;
+    });
+
+    if(double_lightdata_6 != -1) {
+        if(double_lightdata_6 > 550) {
+            double_time_6 += timeout;
+            console.log("double_time_6: %d", double_time_6);
+
+            if(double_time_6 >= n) {
+                console.log("double_time_6: BUZZER ON!");
+                gpio.digitalWrite(BUZZER, 1);
+                double_time_6 = 0;
+
+                setTimeout(turnOffBuzzer, 1000);
+            }
+        }
+        else {
+            double_time_6 = 0;
+        }
+
+        double_lightdata_6 = -1;
+    }
+}
+
+// initialization (modules)
 gpio.wiringPiSetup();
 gpio.pinMode(accelTrig, gpio.OUTPUT);
 gpio.pinMode(accelEcho, gpio.INPUT);
 gpio.pinMode(BUZZER, gpio.OUTPUT);
-gpio.pinMode(LAZER, gpio.OUTPUT);
+gpio.pinMode(RAZER, gpio.OUTPUT);
 
 setTimeout(mainController, 500);
 
