@@ -5,13 +5,11 @@ const mysql = require('mysql');
 const mcpadc = require('mcp-spi-adc');
 
 const test = require('./modules/test.js');
-const { connect } = require('http2');
-const { post } = require('request');
 
 const SPI_SPEED = 1000000;
 
-const accelTrig = 25;
-const accelEcho = 24;
+const accelTrig = 24;
+const accelEcho = 25;
 const BUZZER = 7;
 const LAZER = 29;
 const CS_MCP3208_0 = 10;
@@ -19,7 +17,6 @@ const CS_MCP3208_1 = 11;
 
 const ELEV_UP = 3;
 const ELEV_DOWN = 4;
-
 
 // 주차 차량 감지 (주차 자리 총 3개)
 const CAR_PARKING_0 = 0;
@@ -48,11 +45,11 @@ var warningBuzzer = 0;
 var elev_up_lightdata = -1;
 var elev_down_lightdata = -1;
 
-var timeout= 500;
+var timeout = 500;
 
 var count = 0;
 
-var url = 'http://192.9.44.254:65001'
+var url = 'http://192.9.45.132:65001'
 
 // initialization
 const elev_up = mcpadc.openMcp3208(ELEV_UP, {speedHz: SPI_SPEED}, (err) => {
@@ -99,16 +96,15 @@ const mainController = () => {
         elev();
     }
 
-    if(data.lazer == true) {
-        turnOnLazer();
-    }
+    // if(data.lazer == true) {
+    //     turnOnLazer();
+    // }
 
     // 주차 차량 감지
     if(data.parking == true) {
-        Car_parking_0();
+        carParking();
     }
 });
-
 
 if(warningBuzzer == 1) {
     request.get(
@@ -215,34 +211,25 @@ let parking_time_1 = 0;
 let parking_time_2 = 0;
 
 const carParking = () => {
+
+    // 주차 자리 0번
     car_parking_0.read((error, reading) => {
         console.log("주차 자리 0번 조도값: %d", reading.rawValue);
 
         car_lightdata_0 = reading.rawValue;
     });
-    car_parking_1.read((error, reading) => {
-        console.log("주차 자리 1번 조도값: %d", reading.rawValue);
 
-        car_lightdata_1 = reading.rawValue;
-    });
-    car_lightdata_2.read((error, reading) => {
-        console.log("주차 자리 2번 조도값: %d", reading.rawValue);
-
-        car_lightdata_2 = reading.rawValue;
-    });
-
-    // 주차 자리 0번
     if(car_lightdata_0 != -1) {
         if(car_lightdata_0 > 2200) {            // 0번에 차량이 주차된 경우
-            parking_time_0 += parseInt(timeout);
+            parking_time_0 += timeout;
             console.log("parking_time_0: %d", parking_time_0);
 
             if(parking_time_0 >= n) {
                 let position = 0;
                 let car_num = '주차 0번';
-                let parking_time = new Date();
+                // let parking_time = new Date();
 
-                connection.query('INSERT INTO parknow VALUES(?, ?, ?)', [position, car_num, parking_time], (err, result) => {
+                connection.query('INSERT INTO parknow VALUES(?, ?)', [position, car_num], (err, result) => {
                     if(err) {
                         console.log("DB: 주차 0번 parknow 테이블 저장 실패!");
                         console.log(err);
@@ -254,25 +241,32 @@ const carParking = () => {
                 
                 parking_time_0 = 0;
             }
-            else {
-                parking_time_0 = 0;
-            }
-
-            car_lightdata_0 = -1;
         }
+        else {
+            parking_time_0 = 0;
+        }
+
+        car_lightdata_0 = -1;
     }
+    
     // 주차 자리 1번
+    car_parking_1.read((error, reading) => {
+        console.log("주차 자리 1번 조도값: %d", reading.rawValue);
+
+        car_lightdata_1 = reading.rawValue;
+    });
+
     if(car_lightdata_1 != -1) {
         if(car_lightdata_1 > 2200) {            // 1번에 차량이 주차된 경우
-            parking_time_1 += parseInt(timeout);
+            parking_time_1 += timeout;
             console.log("parking_time_1: %d", parking_time_1);
 
             if(parking_time_1 >= n) {
                 let position = 1;
                 let car_num = '주차 1번';
-                let parking_time = new Date();
+                // let parking_time = new Date();
 
-                connection.query('INSERT INTO parknow VALUES(?, ?, ?)', [position, car_num, parking_time], (err, result) => {
+                connection.query('INSERT INTO parknow VALUES(?, ?)', [position, car_num], (err, result) => {
                     if(err) {
                         console.log("DB: 주차 1번 parknow 테이블 저장 실패!");
                         console.log(err);
@@ -284,25 +278,32 @@ const carParking = () => {
 
                 parking_time_1 = 0;
             }
-            else {
-                parking_time_1 = 0;
-            }
-
-            car_lightdata_1 = -1;
         }
+        else {
+            parking_time_1 = 0;
+        }
+
+        car_lightdata_1 = -1;
     }
+
     // 주차 자리 2번
+    car_parking_2.read((error, reading) => {
+        console.log("주차 자리 2번 조도값: %d", reading.rawValue);
+
+        car_lightdata_2 = reading.rawValue;
+    });
+
     if(car_lightdata_2 != -1) {
         if(car_lightdata_2 > 2200) {            // 2번에 차량이 주차된 경우
-            parking_time_2 += parseInt(timeout);
+            parking_time_2 += timeout;
             console.log("parking_time_2: %d", parking_time_2);
 
             if(parking_time_2 >= n) {
                 let position = 2;
                 let car_num = '주차 2번';
-                let parking_time = new Date();
+                // let parking_time = new Date();
 
-                connection.query('INSERT INTO parknow VALUES(?, ?, ?)', [position, car_num, parking_time], (err, result) => {
+                connection.query('INSERT INTO parknow VALUES(?, ?)', [position, car_num], (err, result) => {
                     if(err) {
                         console.log("DB: 주차 2번 parknow 테이블 저장 실패!");
                         console.log(err);
@@ -314,12 +315,12 @@ const carParking = () => {
 
                 parking_time_2 = 0;
             }
-            else {
-                parking_time_2 = 0;
-            }
-
-            car_lightdata_2 = -1;
         }
+        else {
+            parking_time_2 = 0;
+        }
+
+        car_lightdata_2 = -1;
     }
 }
 
