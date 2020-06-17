@@ -132,7 +132,8 @@ app.post('/api/auth/login', function(req, res) {
             let login = JSON.parse(data);
 
             if(login.username == req.body.username && login.password == req.body.password) {
-                let result = {"username":"gachon", "name":"이우석"};
+                let result = {"username":login.username, "name":login.name};
+                result = JSON.stringify(result);
 
                 return res.status(200).json(result);
             }
@@ -145,19 +146,20 @@ app.post('/api/auth/login', function(req, res) {
 
 // 비밀번호 변경
 app.post('/api/auth/register', function(req, res) {
-    fs.readFile("./config/password.json", "utf-8", (err, data) => {
+    fs.readFile("./config/login.json", "utf-8", (err, data) => {
         if(err) {
             return res.status(500);
         }
         else {
             let adminInfo = JSON.parse(data);
 
-            if(adminInfo.username == req.body.username && adminInfo.oldPassword == req.body.oldPassword) {
-                let oldPassword = adminInfo.newPassword;
+            if(adminInfo.username == req.body.username && adminInfo.password == req.body.oldPassword) {
                 let newPassword = req.body.newPassword;
 
-                let result = {"oldPassword":oldPassword, "newPassword":newPassword};
-                fs.writeFile("./config/password.json", json(result), "utf-8");
+                let result = {"username":adminInfo.username, "password":newPassword, "name":adminInfo.name};
+                result = JSON.stringify(result);
+
+                fs.writeFile("./config/login.json", result, "utf-8");
 
                 return res.status(200);
             }
@@ -176,7 +178,9 @@ app.post('/api/sales/charge', function(req, res) {
         }
         else {
             let result = req.body.newCharge;
-            fs.writeFile("./config/fee.json", json(result), "utf-8");
+            result = JSON.stringify(result);
+
+            fs.writeFile("./config/fee.json", result, "utf-8");
 
             return res.status(200);
         }
@@ -191,7 +195,9 @@ app.post("/api/setting/period", function(req, res) {
         }
         else {
             let result = req.body.newPeriod;
-            fs.writeFile("./config/measure.json", json(result), "utf-8");
+            result = JSON.stringify(result);
+
+            fs.writeFile("./config/measure.json", result, "utf-8");
 
             return res.status(200);
         }
