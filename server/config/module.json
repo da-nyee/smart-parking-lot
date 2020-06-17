@@ -1,0 +1,16 @@
+{
+    "module_state":[
+        {
+            "name":"주차장 길 안내 기능",
+            "status":true
+        },
+        {
+            "name":"일방통행 감지 기능",
+            "status":true
+        },
+        {
+            "name":"엘리베이터 설정 기능",
+            "status":true
+        }
+    ]
+}
