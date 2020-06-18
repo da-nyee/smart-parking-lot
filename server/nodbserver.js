@@ -172,32 +172,65 @@ app.post('/api/auth/register', function(req, res) {
 
 // 요금 변경
 app.post('/api/sales/charge', function(req, res) {
-    fs.readFile("./config/fee.json", "utf-8", (err, data) => {
+    let result = req.body.newCharge;
+    result = JSON.stringify(result);
+
+    fs.writeFile("./config/fee.json", result, "utf-8", (err, data) => {
+        if(!err) { return res.status(200); }
+        else { return res.status(500); }
+    })
+});
+
+// 측정 주기 변경
+app.post("/api/setting/period", function(req, res) {
+    let result = req.body.newPeriod;
+    result = JSON.stringify(result);
+
+    fs.writeFile("./config/measure.json", result, "utf-8", (err, data) => {
+        if(!err) { return res.status(200); }
+        else { return res.status(500); }
+    })
+});
+
+// login.json 응답 라우터
+app.get("/login", function(req, res) {
+    fs.readFile("./config/login.json", "utf-8", (err, data) => {
         if(err) {
             return res.status(500);
         }
         else {
-            let result = req.body.newCharge;
-            result = JSON.stringify(result);
-
-            fs.writeFile("./config/fee.json", result, "utf-8");
+            let loginData = JSON.parse(data);
+            res.send(loginData);
 
             return res.status(200);
         }
     })
 });
 
-// 측정 주기 변경
-app.post("/api/setting/period", function(req, res) {
+// fee.json 응답 라우터
+app.get("/fee", function(req, res) {
+    fs.readFile("./config/fee.json", "utf-8", (err, data) => {
+        if(err) {
+            return res.status(500);
+        }
+        else {
+            let feeData = JSON.parse(data);
+            res.send(feeData);
+
+            return res.status(200);
+        }
+    })
+});
+
+// measure.json 응답 라우터
+app.get("/measure", function(req, res) {
     fs.readFile("./config/measure.json", "utf-8", (err, data) => {
         if(err) {
             return res.status(500);
         }
         else {
-            let result = req.body.newPeriod;
-            result = JSON.stringify(result);
-
-            fs.writeFile("./config/measure.json", result, "utf-8");
+            let measureData = JSON.parse(data);
+            res.send(measureData);
 
             return res.status(200);
         }
