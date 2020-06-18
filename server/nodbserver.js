@@ -192,6 +192,51 @@ app.post("/api/setting/period", function(req, res) {
     })
 });
 
+// login.json 응답 라우터
+app.get("/login", function(req, res) {
+    fs.readFile("./config/login.json", "utf-8", (err, data) => {
+        if(err) {
+            return res.status(500);
+        }
+        else {
+            let loginData = JSON.parse(data);
+            res.send(loginData);
+
+            return res.status(200);
+        }
+    })
+});
+
+// fee.json 응답 라우터
+app.get("/fee", function(req, res) {
+    fs.readFile("./config/fee.json", "utf-8", (err, data) => {
+        if(err) {
+            return res.status(500);
+        }
+        else {
+            let feeData = JSON.parse(data);
+            res.send(feeData);
+
+            return res.status(200);
+        }
+    })
+});
+
+// measure.json 응답 라우터
+app.get("/measure", function(req, res) {
+    fs.readFile("./config/measure.json", "utf-8", (err, data) => {
+        if(err) {
+            return res.status(500);
+        }
+        else {
+            let measureData = JSON.parse(data);
+            res.send(measureData);
+
+            return res.status(200);
+        }
+    })
+});
+
 app.listen(65011, function () {
     console.log("****server on localhost:65011****")
 })
