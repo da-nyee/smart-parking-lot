@@ -1,10 +1,11 @@
 // 데이터베이스 없는 버전
 // EXPRESS 모듈만 돌리면 작동됨
 
-const fs = require("fs")
+const fs = require("fs");
 const express = require('express');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const app = express();
+const session = require('express-session');
 
 // post 분석을 위한 bodyParser
 app.use(bodyParser.json());
@@ -12,8 +13,15 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
+// 세션 설정
+app.use(session({
+    secret: 'keyboard cat',         // 랜덤한 값
+    resave: false,
+    saveUninitialized: true
+}));
+
 // 로그인
-// 세션에 저장하기
+// 세션 저장
 app.post('/api/auth/login', function(req, res) {
     fs.readFile("./config/login.json", "utf-8", (err, data) => {
         if(err) {
@@ -29,6 +37,9 @@ app.post('/api/auth/login', function(req, res) {
                 };
                 result = JSON.stringify(result);
 
+                req.session.username = login.username;
+                req.session.name = login.name;
+
                 return res.status(200).send(result);    // send()에 end() 포함되어 있음
             }
             else {
@@ -36,6 +47,24 @@ app.post('/api/auth/login', function(req, res) {
             }
         }
     })
+});
+
+// 세션 확인
+app.get('/api/auth/check', function(req, res) {
+    if(req.session.username && req.session.name) {
+        return res.status(200).end();
+    }
+    else {
+        return res.status(401).end();
+    }
+});
+
+// 로그아웃
+// 세션 삭제
+app.get('/api/auth/logout', function(req, res) {
+    req.session.destroy();
+
+    return res.status(204).end();           // 204: 내용 정상 처리됨, 콘텐츠 없음
 });
 
 // 비밀번호 변경
@@ -88,22 +117,6 @@ app.put("/api/setting/period", function(req, res) {
     fs.writeFile("./config/measure.json", result, "utf-8", (err) => {
         if(!err) { return res.status(200).end(); }
         else { return res.status(500).end(); }
-    })
-});
-
-// login.json 응답 라우터
-// 세션에서 불러오기
-app.get("/login", function(req, res) {
-    fs.readFile("./config/login.json", "utf-8", (err, data) => {
-        if(err) {
-            return res.status(500);
-        }
-        else {
-            let loginData = JSON.parse(data);
-            res.send(loginData);        // send()에 end() 포함되어 있음
-
-            return res.status(200);
-        }
     })
 });
 
