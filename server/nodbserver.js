@@ -211,6 +211,66 @@ app.put("/api/control/status", function(req, res) {
     });
 });
 
+// 모듈 초기화
+app.get("/api/control/init", function(req, res) {
+    
+    // control.json >>> tempControl.json 복사
+    fs.readFile("./config/control.json", "utf-8", (err, data) => {
+        if(err) { return res.status(500).end(); }
+        else {
+            let temp = JSON.parse(data);
+            let statusTemp = temp["control"];
+
+            temp = JSON.stringify(temp);
+
+            fs.writeFile("./config/tempControl.json", temp ,"utf-8", (err) => {
+                if(err) { return res.status(500).end(); }
+            });
+
+            // control.json의 모든 status 값 false로 변경
+            for(let i = 0; i < statusTemp.length; i++) {
+                statusTemp[i]["status"] = false;
+            }
+
+            statusNew = {};
+            statusNew["control"] = statusTemp;
+            statusNew = JSON.stringify(statusNew);
+
+            fs.writeFile("./config/control.json", statusNew, "utf-8", (err) => {
+                if(err) { return res.status(500).end(); }
+            });
+
+            // 3초 대기
+            // tempControl.json >>> control.json 붙여넣기
+            setTimeout(function() {
+                fs.readFile("./config/tempControl.json", "utf-8", (err, data) => {
+                    if(err) { return res.status(500).end(); }
+                    else {
+                        let original = JSON.parse(data);
+                        original = JSON.stringify(original);
+
+                        fs.writeFile("./config/control.json", original, "utf-8", (err) => {
+                            if(err) { return res.status(500).end(); }
+                            else {
+                                // 원상복구 응답
+                                fs.readFile("./config/control.json", "utf-8", (err, data) => {
+                                    if(err) { return res.status(500).end(); }
+                                    else {
+                                        let controlData = JSON.parse(data);
+                                        controlData = controlData["control"];
+
+                                        return res.status(200).json(controlData);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }, 3000);
+        }
+    });
+});
+
 app.listen(4000, function () {
     console.log("****server on localhost:4000****")
 })

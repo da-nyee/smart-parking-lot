@@ -1,0 +1,28 @@
+﻿{
+    "control": [
+        {
+            "name": "accel",
+            "status": true
+        },
+        {
+            "name": "elev",
+            "status": false
+        },
+        {
+            "name": "parking",
+            "status": false
+        },
+        {
+            "name": "double_parking",
+            "status": false
+        },
+        {
+            "name": "maxCar",
+            "status": true
+        },
+        {
+            "name": "parkInOut",
+            "status": false
+        }
+    ]
+}
