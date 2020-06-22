@@ -6,6 +6,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const session = require('express-session');
+const cookieParser = require("cookie-parser");
 
 // post 분석을 위한 bodyParser
 app.use(bodyParser.json());
@@ -14,10 +15,15 @@ app.use(bodyParser.urlencoded({
 }));
 
 // 세션 설정
+app.use(cookieParser('keyboard cat'));
 app.use(session({
-    secret: 'keyboard cat',         // 랜덤한 값
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    secret: 'keyboard cat',
+    cookie: {
+        httpOnly: true,
+        secure: false
+    }
 }));
 
 // 로그인
@@ -46,7 +52,7 @@ app.post('/api/auth/login', function(req, res) {
                 return res.status(401).end();
             }
         }
-    })
+    });
 });
 
 // 세션 확인
@@ -95,7 +101,7 @@ app.put('/api/auth/register', function(req, res) {
                 return res.status(401).end();
             }
         }
-    })
+    });
 });
 
 // 요금 변경
@@ -106,7 +112,7 @@ app.put('/api/sales/charge', function(req, res) {
     fs.writeFile("./config/fee.json", result, "utf-8", (err) => {
         if(!err) { return res.status(200).end(); }
         else { return res.status(500).end(); }
-    })
+    });
 });
 
 // 측정 주기 변경
@@ -117,7 +123,7 @@ app.put("/api/setting/period", function(req, res) {
     fs.writeFile("./config/measure.json", result, "utf-8", (err) => {
         if(!err) { return res.status(200).end(); }
         else { return res.status(500).end(); }
-    })
+    });
 });
 
 // fee.json 응답 라우터
@@ -135,7 +141,7 @@ app.get("/api/sales/charge", function(req, res) {
 
             return res.status(200).json(feeData);
         }
-    })
+    });
 });
 
 // measure.json 응답 라우터
@@ -153,7 +159,116 @@ app.get("/measure", function(req, res) {
 
             return res.status(200).json(measureData);
         }
-    })
+    });
+});
+
+// 모듈 상태 조회
+app.get("/api/control/status", function(req, res) {
+    fs.readFile("./config/control.json", "utf-8", (err, data) => {
+        if(err) {
+            return res.status(500).end();
+        }
+        else {
+            let controlData = JSON.parse(data);
+
+            return res.status(200).json(controlData);
+        }
+    });
+});
+
+// 모듈 상태 변경
+app.put("/api/control/status", function(req, res) {
+    fs.readFile("./config/control.json", "utf-8", (err, data) => {
+        if(err) {
+            return res.status(500).end();
+        }
+        else {
+            let temp = JSON.parse(data);
+            temp = temp["control"];
+            
+            let name = req.body.name;
+            let status = req.body.status;
+
+            for(let i = 0; i < temp.length; i++) {
+                if(temp[i]["name"] == name) {
+                    temp[i]["status"] = status;
+                }
+            }
+
+            let controlData = {};
+            controlData["control"] = temp;
+            controlData = JSON.stringify(controlData);
+
+            fs.writeFile("./config/control.json", controlData, "utf-8", (err) => {
+                if(err) {
+                    return res.status(500).end();
+                }
+                else {
+                    return res.status(200).end();
+                }
+            });
+        }
+    });
+});
+
+// 모듈 초기화
+app.get("/api/control/init", function(req, res) {
+    
+    // control.json >>> tempControl.json 복사
+    fs.readFile("./config/control.json", "utf-8", (err, data) => {
+        if(err) { return res.status(500).end(); }
+        else {
+            let temp = JSON.parse(data);
+            let statusTemp = temp["control"];
+
+            temp = JSON.stringify(temp);
+
+            fs.writeFile("./config/tempControl.json", temp ,"utf-8", (err) => {
+                if(err) { return res.status(500).end(); }
+            });
+
+            // control.json의 모든 status 값 false로 변경
+            for(let i = 0; i < statusTemp.length; i++) {
+                statusTemp[i]["status"] = false;
+            }
+
+            statusNew = {};
+            statusNew["control"] = statusTemp;
+            statusNew = JSON.stringify(statusNew);
+
+            fs.writeFile("./config/control.json", statusNew, "utf-8", (err) => {
+                if(err) { return res.status(500).end(); }
+            });
+
+            // 3초 대기
+            // tempControl.json >>> control.json 붙여넣기
+            setTimeout(function() {
+                fs.readFile("./config/tempControl.json", "utf-8", (err, data) => {
+                    if(err) { return res.status(500).end(); }
+                    else {
+                        let original = JSON.parse(data);
+                        original = JSON.stringify(original);
+
+                        fs.writeFile("./config/control.json", original, "utf-8", (err) => {
+                            if(err) { return res.status(500).end(); }
+                            else {
+                                // 원상복구 응답
+                                fs.readFile("./config/control.json", "utf-8", (err, data) => {
+                                    if(err) { return res.status(500).end(); }
+                                    else {
+                                        let controlData = JSON.parse(data);
+                                        controlData = controlData["control"];
+
+                                        return res.status(200).json(controlData);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }, 3000);
+        }
+    });
 });
 
 app.listen(4000, function () {
