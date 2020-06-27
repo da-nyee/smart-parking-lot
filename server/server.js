@@ -1,6 +1,3 @@
-// 데이터베이스 없는 버전
-// EXPRESS 모듈만 돌리면 작동됨
-
 const fs = require("fs");
 const express = require('express');
 const bodyParser = require('body-parser');
