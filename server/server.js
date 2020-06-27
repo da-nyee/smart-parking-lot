@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const app = express();
 const session = require('express-session');
 const cookieParser = require("cookie-parser");
-const { connect } = require("http2");
 
 // post 분석을 위한 bodyParser
 app.use(bodyParser.json());
@@ -16,7 +15,7 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser('keyboard cat'));
 app.use(session({
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     secret: 'keyboard cat',
     cookie: {
         httpOnly: true,
@@ -56,7 +55,12 @@ app.post('/api/auth/login', function(req, res) {
 // 세션 확인
 app.get('/api/auth/check', function(req, res) {
     if(req.session.username && req.session.name) {
-        return res.status(200).end();
+        let sessionData = {
+            username: req.session.username,
+            name: req.session.name
+        };
+
+        return res.status(200).json(sessionData);
     }
     else {
         return res.status(401).end();
@@ -91,7 +95,9 @@ app.put('/api/auth/register', function(req, res) {
                 result = JSON.stringify(result);
 
                 fs.writeFile("./config/login.json", result, "utf-8", (err) => {
-                    if(!err) { return res.status(200).end(); }
+                    delete result.password;
+
+                    if(!err) { return res.status(200).send(result); }
                     else { return res.status(500).end(); }
                 });
             }
@@ -108,8 +114,17 @@ app.put('/api/sales/charge', function(req, res) {
     result = JSON.stringify({ charge: result });
 
     fs.writeFile("./config/fee.json", result, "utf-8", (err) => {
-        if(!err) { return res.status(200).end(); }
-        else { return res.status(500).end(); }
+        if(!err) {
+            let feeData = {
+                oldCharge: req.body.newCharge,
+                newCharge: ""
+            };
+        
+            return res.status(200).json(feeData);
+        }
+        else {
+            return res.status(500).end();
+        }
     });
 });
 
@@ -119,8 +134,17 @@ app.put("/api/setting/period", function(req, res) {
     result = JSON.stringify({ period: result });
 
     fs.writeFile("./config/measure.json", result, "utf-8", (err) => {
-        if(!err) { return res.status(200).end(); }
-        else { return res.status(500).end(); }
+        if(!err) {
+            let periodData = {
+                oldPeriod: req.body.newPeriod,
+                newPeriod: ""
+            };
+
+            return res.status(200).json(periodData);
+        }
+        else {
+            return res.status(500).end();
+        }
     });
 });
 
@@ -169,7 +193,7 @@ app.get("/api/control/status", function(req, res) {
         else {
             let controlData = JSON.parse(data);
 
-            return res.status(200).json(controlData);
+            return res.status(200).json(controlData.control);
         }
     });
 });
@@ -202,7 +226,7 @@ app.put("/api/control/status", function(req, res) {
                     return res.status(500).end();
                 }
                 else {
-                    return res.status(200).end();
+                    return res.status(200).send(controlData.control);
                 }
             });
         }
@@ -290,7 +314,7 @@ app.get("/api/graph/sales", function(req, res) {
 
     // Date 객체로 변경
     // Date 객체를 String 객체로 파싱
-    fromDate = new Date(fromDate).toYMD();
+    fromDate = new Date(fromDate).toYMDAPI();
     toDate = new Date(toDate).toYMD();
 
     let salesData = connection.query(
@@ -313,7 +337,7 @@ app.get("/api/graph/usage", function(req, res) {
     let parkSpace = 12;                 // 주차 자리 12개
 
     let reqDate = req.query.date;
-    reqDate = new Date(reqDate).toYMD().substring(0, 11);
+    reqDate = new Date(reqDate).toYMDAPI().substring(0, 11);
 
     let logData = connection.query(
         "SELECT DATE_FORMAT(start_time, '%H') as startTime, DATE_FORMAT(end_time, '%H') as endTime from parklog WHERE DATE_FORMAT(end_time, '%Y-%m-%d') = '" + reqDate + "';"  
@@ -333,7 +357,7 @@ app.get("/api/graph/usage", function(req, res) {
     for(let i = 0; i < usageList.length; i++) {
         let usageDict = {};
 
-        usageList[i] = (usageList[i] / parkSpace) * 100;        // 비율 계산
+        let usageVal = (usageList[i] / parkSpace) * 100;        // 비율 계산
         
         let timeIdx = String(i);
         if(timeIdx.length == 1) {
@@ -341,7 +365,7 @@ app.get("/api/graph/usage", function(req, res) {
         }
 
         usageDict["date"] = timeIdx;
-        usageDict["usage"] = usageList[i];
+        usageDict["usage"] = usageVal;
 
         usageData.push(usageDict);
     }
@@ -402,10 +426,32 @@ app.listen(4000, function () {
 
         month = String(this.getMonth() + 1);
         if(month.length == 1) {
-            month = "0"+month;
+            month = "0" + month;
         }
 
-        day = String(this.getDate() - 1);
+        day = String(this.getDate());
+        if(day.length == 1) {
+            day = "0" + day;
+        }
+
+        return year + "-" + month + "-" + day + " " + this.getHours() + ":" + this.getMinutes() + ":" + this.getSeconds();
+    }
+})();
+
+(function() {
+    Date.prototype.toYMDAPI = Date_toYMDAPI;
+
+    function Date_toYMDAPI() {
+        let year, month, day;
+
+        year = String(this.getFullYear());
+
+        month = String(this.getMonth() + 1);
+        if(month.length == 1) {
+            month = "0" + month;
+        }
+
+        day = String(this.getDate() - 1);               // day - 1
         if(day.length == 1) {
             day = "0" + day;
         }
