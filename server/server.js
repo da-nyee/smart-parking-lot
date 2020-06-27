@@ -352,6 +352,43 @@ app.get("/api/graph/usage", function(req, res) {
     return res.status(200).send(usageData);
 });
 
+// 주차 상황판
+app.get("/api/board/parking", function(req, res) {
+    let parkingList = connection.query(
+        "SELECT n.position, n.car_num, c.start_time FROM parkcar as c RIGHT OUTER JOIN parknow as n ON c.car_num = n.car_num;"
+    );
+
+    // 시간당 요금 추출
+    let chargeFee = fs.readFileSync('./config/fee.json', 'utf8');
+    chargeFee = JSON.parse(chargeFee);
+
+    let parkingData = [];
+    for(let i = 0; i < parkingList.length; i++) {
+        let parkingDict = {};
+
+        if(parkingList[i].car_num == null) {
+            parkingData.push(false);
+        }
+        else {
+            parkingDict["number"] = parkingList[i].car_num;
+            parkingDict["start"] = parkingList[i].start_time;
+
+            // 요금 계산
+            let startTime = new Date(parkingDict["start"]);
+            let nowTime = new Date();
+            let parkingFee = chargeFee.charge * (parseInt((nowTime.getTime() - startTime.getTime()) / 3600000) + 1);
+
+            parkingDict["fee"] = parkingFee;
+
+            parkingData.push(parkingDict);
+        }
+    }
+
+    parkingData = JSON.stringify(parkingData);
+
+    return res.status(200).send(parkingData);
+});
+
 // 서버 실행
 app.listen(4000, function () {
     console.log("****server on localhost:4000****")
