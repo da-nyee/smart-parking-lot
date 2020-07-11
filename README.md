@@ -1,6 +1,12 @@
 ## Smart Parking Lot (Embedded Application Programming Final Project)
 웹기반 임베디드, AI 기술을 이용한 스마트 주차장 시스템
 
+### Tech Stack
+|Embedded           |Server   |Web    |AI          |
+|-------------------|---------|-------|------------|
+|`Raspberry Pi 3 B+`|`Node.js`|`React`|`Tensorflow`|
+|`MySQL`            |         |       |`AWS Lambda`|
+
 ### Developer
 - https://github.com/da-nyee (Daeun Lee, 이다은)
 - https://github.com/qkdrnvhrrur (Wooseok Lee, 이우석)
