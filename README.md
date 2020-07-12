@@ -2,10 +2,12 @@
 웹기반 임베디드, AI 기술을 이용한 스마트 주차장 시스템
 
 ### Tech Stack
-|Embedded           |Server   |Web    |AI          |
-|-------------------|---------|-------|------------|
-|`Raspberry Pi 3 B+`|`Node.js`|`React`|`Tensorflow`|
-|`MySQL`            |         |       |`AWS Lambda`|
+|Embedded           |Server   |Web    |AI          |Cloud               |
+|-------------------|---------|-------|------------|--------------------|
+|`Raspberry Pi 3 B+`|`Node.js`|`React`|`Tensorflow`|`Amazon EC2`        |
+|`MySQL`            |         |       |            |`AWS Lambda`        |
+|                   |         |       |            |`Amazon S3`         |
+|                   |         |       |            |`Amazon API Gateway`|
 
 ### Developer
 - https://github.com/da-nyee (Daeun Lee, 이다은)
