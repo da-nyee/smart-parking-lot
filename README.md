@@ -2,13 +2,13 @@
 웹기반 임베디드, AI 기술을 이용한 스마트 주차장 시스템
 
 ### Preview - Device
-<img src="./img/smart_parking_lot_device.jpg" width="560px" height="400px">
+<img src="./img/smart_parking_lot_device.jpg" width="620px" height="410px">
 
 ### Preview - Kiosk
-<img src="./img/smart_parking_lot_kiosk.png" width="570px" width="570px">
+<img src="./img/smart_parking_lot_kiosk.png" width="620px" width="620px">
 
 ### Preview - Web
-![smart_parking_lot_web](./img/smart_parking_lot_web.png)
+<img src="./img/smart_parking_lot_web.png" width="620px" width="620px">
 
 ### Tech Stack
 |Embedded           |Server   |Web    |AI          |Cloud               |
