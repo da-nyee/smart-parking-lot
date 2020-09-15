@@ -1,6 +1,15 @@
 ## Smart Parking Lot (Embedded Application Programming Final Project)
 웹기반 임베디드, AI 기술을 이용한 스마트 주차장 시스템
 
+### Preview - Device
+<center><img src="./img/smart_parking_lot_device.jpg" width="560px" height="400px"></center>
+
+### Preview - Kiosk
+<center><img src="./img/smart_parking_lot_kiosk.png" width="560px" width="560px"></center>
+
+### Preview - Web
+![smart_parking_lot_web](./img/smart_parking_lot_web.png)
+
 ### Tech Stack
 |Embedded           |Server   |Web    |AI          |Cloud               |
 |-------------------|---------|-------|------------|--------------------|
