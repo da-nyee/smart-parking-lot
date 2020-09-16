@@ -1,0 +1,42 @@
+/*1층 2층 테이블을 한 행에 표시하기 위해서*/
+
+/*정렬*/
+table {
+  text-align: center;
+}
+
+.space {
+  margin: 1rem;
+}
+
+i {
+  font-size: 200%;
+}
+
+/*자동차 아이콘 크기 키우기*/
+.ri-car-fill {
+  color: lightgray;
+  outline: 2px solid black;
+  padding: 0.25rem;
+  font-size: 400%;
+}
+
+/*주차된 경우 fill 클래스를 추가해서 색칠 ajax addClass/removeClass 이용 */
+.fill {
+  color: black;
+}
+
+/*엘리베이터 칠하기*/
+.lightgray {
+  background: lightgray;
+  height: 3rem;
+  font-size: 1.5rem;
+}
+
+.parking{
+    color:black;
+}
+
+i{
+    cursor:pointer;
+}
