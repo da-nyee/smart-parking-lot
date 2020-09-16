@@ -4,10 +4,10 @@
 ### Preview - Device
 <img src="./img/smart_parking_lot_device.jpg" width="620px" height="410px">
 
-### Preview - Kiosk
+### Preview - Web (Kiosk)
 <img src="./img/smart_parking_lot_kiosk.png" width="620px" width="620px">
 
-### Preview - Web
+### Preview - Web (Admin)
 <img src="./img/smart_parking_lot_web.png" width="620px" width="620px">
 
 ### Tech Stack
