@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>코오롱 주차장</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <style>
+        @font-face {
+            font-family: 'GmarketSansBold';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'GmarketSansMedium';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .header {
+            font-family: "GmarketSansBold";
+            background-color: #66d9e8;
+            color: white;
+            padding: 5px;
+            padding-left: 10px;
+            padding-top: 15px;
+
+        }
+
+        .contents {
+            padding: 5px;
+            font-family: 'GmarketSansMedium';
+            text-align: center;
+        }
+
+        .box {
+            border-style: solid;
+            border-color: orange;
+            border-width: medium;
+            width: 65%;
+            padding: 2%;
+            margin: 10px;
+            text-align: right;
+            position: relative;
+            left: 15%;
+            font-size: 160%;
+        }
+
+        .btn-cyan {
+
+            color: white;
+            padding: 15px;
+            background-color: #66d9e8;
+
+            font-size: 160%;
+            position: relative;
+            left: 20%;
+        }
+
+        .white {
+            display: none;
+        }
+ 
+    </style>
+    <script>
+        $(function() {
+            // socket.io 서버에 접속한다
+            var socket = io();
+            // 서버로부터의 메시지가 수신되면
+            socket.on("pay", function(car_num, pay) {
+                $("#car_num").text("차량번호 : " + car_num);
+                $("#pay").text(pay + "원");
+                $("#pay_btn").removeClass("white")
+            });
+
+            // 서버로부터의 메시지가 수신되면
+            socket.on("reset", function() {
+                $("#car_num").text("차량번호 : ");
+                $("#pay").text("원");
+                $("#pay_btn").addClass("white")
+            });
+            $("form").submit(function(e) {
+                $("#car_num").text("차량번호 : ");
+                $("#pay").text("원"); 
+                $("#pay_btn").addClass("white")
+                // 서버로 메시지를 전송한다.
+                socket.emit("payment");
+            });
+        });
+
+    </script>
+</head>
+
+<body>
+    <div class="header">
+        <h1 style="font-size:350%;">코오롱 주차장</h1>
+    </div>
+    <div class="contents">
+        <h4 style="padding-top: 30px;"> *주차장을 이용해주셔서 감사합니다* </h4>
+        <h1 class="box" id="car_num" style="text-align: left">차량번호 : </h1>
+        <h1 class="box" id="pay"> 원</h1>
+        <form method="get" action="/msg">
+            <input class="btn btn-cyan white" type="submit" id="pay_btn" value="결제하기">
+        </form>
+    </div>
+</body>
+
+</html>
