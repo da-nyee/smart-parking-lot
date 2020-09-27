@@ -18,7 +18,7 @@
 |                   |         |       |            |`Amazon S3`         |
 |                   |         |       |            |`Amazon API Gateway`|
 
-### Developer
+### Developers
 - https://github.com/da-nyee (Daeun Lee, 이다은)
 - https://github.com/qkdrnvhrrur (Wooseok Lee, 이우석)
 - https://github.com/Han-HeyGyeong (Hyegyeong Han, 한혜경)
