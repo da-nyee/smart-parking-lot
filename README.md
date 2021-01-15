@@ -19,7 +19,7 @@
 |                   |         |       |            |`Amazon API Gateway`|
 
 ### Developers
-- https://github.com/da-nyee (Daeun Lee, 이다은)
-- https://github.com/qkdrnvhrrur (Wooseok Lee, 이우석)
-- https://github.com/Han-HeyGyeong (Hyegyeong Han, 한혜경)
-- https://github.com/ghdrlgus96 (Gihyeon Hong, 홍기현)
+|이다은   |이우석   |한혜경   |홍기현   |
+|:-------:|:-------:|:-------:|:-------:|
+|<img src="https://avatars0.githubusercontent.com/u/50176238?s=400&u=212ca9ffd06b88465746a94eaa6f88b10485497d&v=4" alt="daeun" width="100" height="100">|<img src="https://avatars0.githubusercontent.com/u/57385607?s=400&v=4" alt="wooseok" width="100" height="100">|<img src="https://avatars2.githubusercontent.com/u/55129737?s=400&v=4" alt="hyegyeong" width="100" height="100">|<img src="https://avatars0.githubusercontent.com/u/43343889?s=400&v=4" alt="gihyeon" width="100" height="100">|
+|[da-nyee](https://github.com/da-nyee)|[qkdrnvhrrur](https://github.com/qkdrnvhrrur)|[Han-HeyGyeong](https://github.com/Han-HeyGyeong)|[ghdrlgus96](https://github.com/ghdrlgus96)|
